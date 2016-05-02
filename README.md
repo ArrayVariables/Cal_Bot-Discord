@@ -14,6 +14,8 @@ The default set of Cal Bot's modules include but are not limited to:
 * Imgur/gif search
 * And much much more
 
+Visit the [Wiki](https://github.com/Cal9000/Cal_Bot-Discord/wiki) for install instuctions.
+
 Cal Bot is in continuous development and new features get added all the time.
 
 Have fun!
