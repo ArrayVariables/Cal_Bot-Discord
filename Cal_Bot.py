@@ -122,16 +122,17 @@ def user_allowed(message):
 async def get_oauth_url():
     endpoint = "https://discordapp.com/api/oauth2/applications/@me"
     if bot.headers.get('authorization') is None:
-        bot.headers['authorization'] = "Bot {}".format(settings.email)
+        data = await
+        resp.json()
+
+        return discord.utils.oauth_url(data.get('id'))
+
+    bot.headers['authorization'] = "Bot {}".format(settings.email)
 
     async with bot.session.get(endpoint, headers=bot.headers) as resp:
-        data = await resp.json()
-
-    return discord.utils.oauth_url(data.get('id'))
-
 
 def check_folders():
-    folders = ("data", "data/red", "cogs", "cogs/utils")
+    folders = ("data", "data/CalBot", "cogs", "cogs/utils")
     for folder in folders:
         if not os.path.exists(folder):
             print("Creating " + folder + " folder...")
@@ -140,7 +141,7 @@ def check_folders():
 
 def check_configs():
     if settings.bot_settings == settings.default_settings:
-        print("Red - First run configuration\n")
+        print("Cal Bot - First run configuration\n")
         print("I have ended support for normal Discord accounts. Use a Qauth account from now on\n")
         print("Enter your bot account info from: "
               "https://discordapp.com/developers/applications/me then enter "
@@ -157,8 +158,8 @@ def check_configs():
             settings.email = choice
             settings.password = input("\nPassword> ")
         else:
-            os.remove('data/red/settings.json')
-            input("Invalid input. Restart Red and repeat the configuration "
+            os.remove('data/CalBot/settings.json')
+            input("Invalid input. Restart CalBot and repeat the configuration "
                   "process.")
             exit(1)
 
@@ -200,7 +201,7 @@ def check_configs():
         if settings.default_mod == "":
             settings.default_mod = "Process"
 
-    cogs_s_path = "data/red/cogs.json"
+    cogs_s_path = "data/CalBot/cogs.json"
     cogs = {}
     if not os.path.isfile(cogs_s_path):
         print("Creating new cogs.json...")
@@ -213,17 +214,17 @@ def set_logger():
     logger = logging.getLogger("discord")
     logger.setLevel(logging.WARNING)
     handler = logging.FileHandler(
-        filename='data/red/discord.log', encoding='utf-8', mode='a')
+        filename='data/CalBot/discord.log', encoding='utf-8', mode='a')
     handler.setFormatter(logging.Formatter(
         '%(asctime)s %(levelname)s %(module)s %(funcName)s %(lineno)d: '
         '%(message)s',
         datefmt="[%d/%m/%Y %H:%M]"))
     logger.addHandler(handler)
 
-    logger = logging.getLogger("red")
+    logger = logging.getLogger("CalBot")
     logger.setLevel(logging.WARNING)
     handler = logging.FileHandler(
-        filename='data/red/red.log', encoding='utf-8', mode='a')
+        filename='data/CalBot/CalBot.log', encoding='utf-8', mode='a')
     handler.setFormatter(logging.Formatter(
         '%(asctime)s %(levelname)s %(module)s %(funcName)s %(lineno)d: '
         '%(message)s',
@@ -243,10 +244,10 @@ def get_answer():
 
 
 def set_cog(cog, value):
-    with open('data/red/cogs.json', "r") as f:
+    with open('data/CalBot/cogs.json', "r") as f:
         data = json.load(f)
     data[cog] = value
-    with open('data/red/cogs.json', "w") as f:
+    with open('data/CalBot/cogs.json', "w") as f:
         f.write(json.dumps(data))
 
 
@@ -260,7 +261,7 @@ def load_cogs():
         no_prompt = False
 
     try:
-        with open('data/red/cogs.json', "r") as f:
+        with open('data/CalBot/cogs.json', "r") as f:
             registry = json.load(f)
     except:
         registry = {}
@@ -298,7 +299,7 @@ def load_cogs():
             registry[extension] = False
 
     if extensions:
-        with open('data/red/cogs.json', "w") as f:
+        with open('data/CalBot/cogs.json', "w") as f:
             f.write(json.dumps(registry))
 
     if failed:
@@ -355,12 +356,12 @@ if __name__ == '__main__':
         loop.run_until_complete(main())
     except discord.LoginFailure:
         logger.error(traceback.format_exc())
-        print("Invalid login credentials. Restart Red and configure it"
+        print("Invalid login credentials. Restart Cal Bot and configure it"
               " properly.")
-        shutil.copy('data/red/settings.json',
-                    'data/red/settings-{}.bak'.format(int(time.time())))
+        shutil.copy('data/CalBot/settings.json',
+                    'data/CalBot/settings-{}.bak'.format(int(time.time())))
         # Hopefully this won't backfire in case of discord servers' problems
-        os.remove('data/red/settings.json')
+        os.remove('data/CalBot/settings.json')
     except:
         logger.error(traceback.format_exc())
         loop.run_until_complete(bot.logout())
